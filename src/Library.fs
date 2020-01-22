@@ -46,3 +46,16 @@ module CprNummer =
                     Løbenummer=digits710 }
         else
             None  
+
+    /// <summary>
+    /// Predicate to check if the CprNummer instance is syntactically valid.
+    /// </summary>
+    /// <remarks>
+    /// Note that this only verifies the syntactic validity, namely that is represents ten digits.
+    /// For testing semantic validity 
+    /// </remarks>
+    let isSyntacticallyValid (cprNummer:CprNummer) =
+        cprNummer.Fødselsdag <= 99uy
+            && cprNummer.Fødselsmåned <= 99uy 
+            && cprNummer.Fødselsår <= 99uy
+            && cprNummer.Løbenummer <= 9999us
