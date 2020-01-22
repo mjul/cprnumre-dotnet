@@ -6,8 +6,27 @@ open Xunit
 open CprNumre
 
 module ValueSemantics = 
-    let ``CprNummer has value semantics`` () =
-        Assert.True(false)
+
+    module ``CprNummer has value semantics`` =
+        let a = CprNummer.tryParseCprNummer "010203-1234" |> Option.get
+        let b = CprNummer.tryParseCprNummer "010203-1234" |> Option.get
+        let c = CprNummer.tryParseCprNummer "010203-1234" |> Option.get
+
+        [<Fact>]
+        let ``its Equals is reflexive`` () =
+            Assert.Equal(a,a)
+
+        [<Fact>]
+        let ``its Equals is transitive`` () =
+            Assert.Equal(a,b)
+            Assert.Equal(b,c)
+            Assert.Equal(a,c)
+
+        [<Fact>]
+        let ``its Equals is symmetric`` () =
+            Assert.Equal(a,b)
+            Assert.Equal(b,a)
+
 
 module Parsing = 
 
@@ -82,3 +101,4 @@ module Validation =
                 Fødselsår=år; Løbenummer=løbenummer }        
             let actual = CprNummer.isSyntacticallyValid erstatningspersonnummer
             Assert.False(actual)
+
