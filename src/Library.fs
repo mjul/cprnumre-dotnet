@@ -59,6 +59,9 @@ module CprNummer =
         cprNummer.Fødselsdag <= 99uy && cprNummer.Fødselsmåned <= 99uy && cprNummer.Fødselsår <= 99uy
         && cprNummer.Løbenummer <= 9999us
 
+    /// <summary>
+    /// Get the birthday as an Option if it is valid. Returns None if the CPR-nummer is not valid.
+    /// </summary>
     let birthday cpr =
         let yearOffset =
             match (cpr.Fødselsdag, cpr.Fødselsmåned) with
