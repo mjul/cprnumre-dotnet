@@ -25,6 +25,7 @@ type CprNummer =
     // Don't let the CPR-nummer leak into logs etc. through ToString
     override x.ToString() = "CPR-nummer xxxxxx-xxxx"
 
+
 /// <Summary>
 /// Functional style API for working with <see cref="CprNumre.CprNummer">CprNummer</see>.
 ///</Summary>
@@ -55,11 +56,27 @@ module CprNummer =
     /// </summary>
     /// <remarks>
     /// Note that this only verifies the syntactic validity, namely that is represents ten digits.
-    /// For testing semantic validity
     /// </remarks>
     let isSyntacticallyValid (cprNummer: CprNummer) =
         cprNummer.Fødselsdag <= 99uy && cprNummer.Fødselsmåned <= 99uy && cprNummer.Fødselsår <= 99uy
         && cprNummer.Løbenummer <= 9999us
+
+    /// <summary>
+    /// Predicate to check if the CprNummer instance has a valid checksum.
+    /// </summary>
+    let isChecksumValid (cprNummer: CprNummer) = 
+        let checksum = 4*((int cprNummer.Fødselsdag / 10) % 10)
+                        + 3*(int cprNummer.Fødselsdag % 10)
+                        + 2*((int cprNummer.Fødselsmåned / 10) % 10)
+                        + 7*(int cprNummer.Fødselsmåned % 10)
+                        + 6*((int cprNummer.Fødselsår / 10) % 10)
+                        + 5*(int cprNummer.Fødselsår % 10)
+                        + 4*((int cprNummer.Løbenummer / 1000) % 10)
+                        + 3*((int cprNummer.Løbenummer / 100) % 10)
+                        + 2*((int cprNummer.Løbenummer / 10) % 10)
+        let expectedControlDigit = 11 - (checksum % 11)              
+        let actualControlDigit = int cprNummer.Løbenummer % 10
+        expectedControlDigit = actualControlDigit
 
     /// <summary>
     /// Get the birthday as an Option if it is valid. Returns None if the CPR-nummer is not valid.

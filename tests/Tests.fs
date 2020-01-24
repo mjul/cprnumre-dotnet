@@ -102,6 +102,17 @@ module Validation =
             let actual = CprNummer.isSyntacticallyValid erstatningspersonnummer
             Assert.False(actual)
 
+    type ``isChecksumValid`` () = 
+        [<Theory>]
+        // Example from specification page 10: https://cpr.dk/media/17534/personnummeret-i-cpr.pdf
+        [<InlineData("070761-4285", true)>]
+        [<InlineData("070761-4286", false)>]
+        member this.``isChecksumValid should match examples in specification`` (cprStr, expected) = 
+            let cpr = CprNummer.tryParseCprNummer cprStr |> Option.get
+            let actual = CprNummer.isChecksumValid cpr
+            Assert.Equal(expected, actual)
+
+
 module Decoding = 
     type ``Birthday`` () =
 
