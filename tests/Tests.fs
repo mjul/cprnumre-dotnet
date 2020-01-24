@@ -112,9 +112,8 @@ module Validation =
             let actual = CprNummer.isChecksumValid cpr
             Assert.Equal(expected, actual)
 
-
 module Decoding = 
-    type ``Birthday`` () =
+    type ``Birthday decoding`` () =
 
         // See https://cpr.dk/media/17534/personnummeret-i-cpr.pdf
         [<Theory>]
@@ -138,6 +137,21 @@ module Decoding =
             let expected = Some (DateTime.SpecifyKind(DateTime(year, month, day), DateTimeKind.Unspecified))
             let actual = CprNummer.birthday cpr
             Assert.Equal(expected, actual)
+
+    type ``Gender decoding`` () = 
+        [<Theory>]
+        [<InlineData("010200-0001")>]
+        let ``gender examples for men`` str =
+            let cpr = CprNummer.tryParseCprNummer(str) |> Option.get
+            let actual = CprNummer.gender cpr
+            Assert.Equal(Male, actual)
+
+        [<Theory>]
+        [<InlineData("010200-0002")>]
+        let ``gender examples for women`` str =
+            let cpr = CprNummer.tryParseCprNummer(str) |> Option.get
+            let actual = CprNummer.gender cpr
+            Assert.Equal(Female, actual)
 
 module Privacy = 
     [<Fact>]

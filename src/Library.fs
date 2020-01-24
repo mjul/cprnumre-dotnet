@@ -25,6 +25,8 @@ type CprNummer =
     // Don't let the CPR-nummer leak into logs etc. through ToString
     override x.ToString() = "CPR-nummer xxxxxx-xxxx"
 
+type Gender = | Male | Female
+
 
 /// <Summary>
 /// Functional style API for working with <see cref="CprNumre.CprNummer">CprNummer</see>.
@@ -109,3 +111,12 @@ module CprNummer =
                 | _ -> None
         yearOffset
         |> Option.map (fun x -> DateTime(x + (int) cpr.Fødselsår, (int) cpr.Fødselsmåned, (int) cpr.Fødselsdag))
+
+
+    /// <summary>
+    /// Get the Gender from the CPR-nummer.
+    /// </summary>
+    let gender (cprNummer: CprNummer) = 
+        match ((int cprNummer.Løbenummer) % 2) with
+        | 0 -> Female
+        | _ -> Male
