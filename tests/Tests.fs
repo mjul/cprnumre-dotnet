@@ -127,3 +127,16 @@ module Decoding =
             let expected = Some (DateTime.SpecifyKind(DateTime(year, month, day), DateTimeKind.Unspecified))
             let actual = CprNummer.birthday cpr
             Assert.Equal(expected, actual)
+
+module Privacy = 
+    [<Fact>]
+    let ``No sensitive data in ToString`` () =
+        let cpr = {Fødselsdag = 1uy; Fødselsmåned = 2uy; Fødselsår = 99uy; Løbenummer = 1234us}
+        let actual = cpr.ToString()
+        Assert.DoesNotContain("01", actual)
+        Assert.DoesNotContain("1", actual)
+        Assert.DoesNotContain("02", actual)
+        Assert.DoesNotContain("2", actual)
+        Assert.DoesNotContain("99", actual)
+        Assert.DoesNotContain("1999", actual)
+        Assert.DoesNotContain("1234", actual)

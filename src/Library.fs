@@ -22,6 +22,8 @@ type CprNummer =
       Fødselsår: uint8
       /// Digits 7-10
       Løbenummer: uint16 }
+    // Don't let the CPR-nummer leak into logs etc. through ToString
+    override x.ToString() = "CPR-nummer xxxxxx-xxxx"
 
 /// <Summary>
 /// Functional style API for working with <see cref="CprNumre.CprNummer">CprNummer</see>.
