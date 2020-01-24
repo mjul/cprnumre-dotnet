@@ -102,3 +102,28 @@ module Validation =
             let actual = CprNummer.isSyntacticallyValid erstatningspersonnummer
             Assert.False(actual)
 
+module Decoding = 
+    type ``Birthday`` () =
+
+        // See https://cpr.dk/media/17534/personnummeret-i-cpr.pdf
+        [<Theory>]
+        [<InlineData("010200-0001", 01,02,1900)>]
+        [<InlineData("010299-0001", 01,02,1999)>]
+        [<InlineData("010200-0999", 01,02,1900)>]
+        [<InlineData("010299-0999", 01,02,1999)>]
+
+        [<InlineData("010200-4000", 01,02,2000)>]
+        [<InlineData("010200-4999", 01,02,2000)>]
+        [<InlineData("010236-4000", 01,02,2036)>]
+        [<InlineData("010236-4999", 01,02,2036)>]
+
+        [<InlineData("010258-5000", 01,02,1858)>]
+        [<InlineData("010258-5999", 01,02,1858)>]
+        [<InlineData("010299-5000", 01,02,1899)>]
+        [<InlineData("010299-5999", 01,02,1899)>]
+
+        let ``birthday examples``  (str, day, month, year) = 
+            let cpr = CprNummer.tryParseCprNummer(str) |> Option.get
+            let expected = Some (DateTime.SpecifyKind(DateTime(year, month, day), DateTimeKind.Unspecified))
+            let actual = CprNummer.birthday cpr
+            Assert.Equal(expected, actual)
