@@ -26,7 +26,7 @@ type CprNummer =
       Fødselsdag: Fødselsdag
       /// Digits 3-4
       Fødselsmåned: Fødselsmåned
-      /// Digits 5-6<
+      /// Digits 5-6
       Fødselsår: Fødselsår
       /// Digits 7-10
       Løbenummer: Løbenummer }
