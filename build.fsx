@@ -14,12 +14,15 @@ Target.initEnvironment ()
 
 let srcDir = "src"
 let testDir = "tests"
+let exampleDir = "examples"
 
 Target.create "Clean" (fun _ ->
     !! (srcDir @@ "**/bin")
     ++ (srcDir @@ "**/obj")
     ++ (testDir @@ "**/bin")
     ++ (testDir @@ "**/obj")
+    ++ (exampleDir @@ "**/bin")
+    ++ (exampleDir @@ "**/obj")
     |> Shell.cleanDirs 
 )
 
@@ -33,6 +36,11 @@ Target.create "BuildTests" (fun _ ->
     |> Seq.iter (DotNet.build id)
 )
 
+Target.create "BuildExamples" (fun _ ->
+    !! (exampleDir @@ "**/*.*proj")
+    |> Seq.iter (DotNet.build id)
+)
+
 Target.create "Test" (fun _ ->
     !! (testDir @@ "**/*.fsproj")
     |> Seq.iter (DotNet.test id)
@@ -43,6 +51,7 @@ Target.create "All" ignore
 "Clean"
   ==> "BuildLibrary"
   ==> "BuildTests"
+  ==> "BuildExamples"
   ==> "Test"
   ==> "All"
 
