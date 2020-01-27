@@ -53,6 +53,12 @@ module CprNummer =
         else
             None
 
+    /// Check that a value is a valid Fødselsår (digits 5-6 of the CPR-nummer) 
+    let isValidFødselsårValue (fødselsår:uint8) = 0uy <= fødselsår && fødselsår <= 99uy
+
+    /// Check that a value is a valid Løbenummer (digits 7-10 of the CPR-nummer) 
+    let isValidLøbenummerValue (løbenummer:uint16) = 0us <= løbenummer && løbenummer <= 9999us
+
     /// <summary>
     /// Predicate to check if the CprNummer instance is syntactically valid.
     /// </summary>
@@ -60,8 +66,9 @@ module CprNummer =
     /// Note that this only verifies the syntactic validity, namely that is represents ten digits.
     /// </remarks>
     let isSyntacticallyValid (cprNummer: CprNummer) =
-        cprNummer.Fødselsdag <= 99uy && cprNummer.Fødselsmåned <= 99uy && cprNummer.Fødselsår <= 99uy
-        && cprNummer.Løbenummer <= 9999us
+        cprNummer.Fødselsdag <= 99uy && cprNummer.Fødselsmåned <= 99uy 
+            && isValidFødselsårValue cprNummer.Fødselsår
+            && isValidLøbenummerValue cprNummer.Løbenummer
 
     /// <summary>
     /// Predicate to check if the CprNummer instance has a valid checksum.
@@ -81,36 +88,42 @@ module CprNummer =
         expectedControlDigit = actualControlDigit
 
     /// <summary>
-    /// Get the birthday as an Option if it is valid. Returns None if the CPR-nummer is not valid.
+    /// Calculate the year of birth for a given two-digit year and the associated løbenummer.
+    /// </summary>
+    /// <param name="fødselsår">the last two digits of the year of birth (digits 5-6 in the CPR-nummer)</param>
+    /// <remarks>
+    /// Example: <c>birthyearForFødselsårLøbenummer 99 1234</c> returns <c>1999</c>.
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Raised if one of the parameters are out of range.</exception>
+    let birthyearForFødselsårLøbenummer fødselsår løbenummer = 
+        if not (isValidFødselsårValue fødselsår) then raise (ArgumentOutOfRangeException("fødselsår",fødselsår, "Fødselsår is not valid"))
+        if not (isValidLøbenummerValue løbenummer) then raise (ArgumentOutOfRangeException("løbenummer", løbenummer, "Løbenummer is not valid"))
+        // This is the table on page 7 in the PDF documentation from CPR.dk
+        // See https://cpr.dk/media/17534/personnummeret-i-cpr.pdf
+        // Not that the age offset just uses the 7th digit 
+        // (the thousands of the Løbenummer), so we can simplify a bit
+        let thousandsOfLøbenummer = (løbenummer / 1000us) % 10us
+        let splitRange minOfHighRange offsetBelow offsetAbove yy = if yy < minOfHighRange then offsetBelow else offsetAbove
+        let yearOffset = match (int fødselsår, int thousandsOfLøbenummer) with
+            | (_, 0) | (_,1) | (_,2) | (_,3) -> 1900
+            | (yy, 4) -> if yy >= 00 && yy <= 36 then 2000 else 1900
+            | (yy, 5) -> if yy >= 00 && yy <= 57 then 2000 else 1800
+            | (yy, 6) -> if yy >= 00 && yy <= 57 then 2000 else 1800
+            | (yy, 7) -> if yy >= 00 && yy <= 57 then 2000 else 1800
+            | (yy, 8) -> if yy >= 00 && yy <= 57 then 2000 else 1800
+            | (yy, 9) -> if yy >= 00 && yy <= 36 then 2000 else 1900
+            | (_,_) -> failwithf "fødselsår/løbenummer out of range (%i, %i)" fødselsår løbenummer
+        yearOffset + (int fødselsår)
+
+    /// <summary>
+    /// Get the birthday as an Option if it is valid.
+    /// Returns None if the CPR-nummer is not valid (e.g. for Erstatningspersonnummer)
     /// </summary>
     let birthday cpr =
-        let yearOffset =
-            match (cpr.Fødselsdag, cpr.Fødselsmåned) with
-            | (dd, mm) when dd >= 0uy && dd <= 31uy && mm >= 0uy && mm <= 12uy ->
-                // This is the table on page 7 in the PDF documentation from CPR.dk
-                // See https://cpr.dk/media/17534/personnummeret-i-cpr.pdf
-                // We could simplify it, but it is kept in this verbose style
-                // to match the specification document.
-                match ((int32) cpr.Fødselsår, (int32) cpr.Løbenummer) with
-                | (yy, ln) when ln >= 0000 && ln <= 0999 -> Some 1900
-                | (yy, ln) when ln >= 1000 && ln <= 1999 -> Some 1900
-                | (yy, ln) when ln >= 2000 && ln <= 2999 -> Some 1900
-                | (yy, ln) when ln >= 3000 && ln <= 3999 -> Some 1900
-                | (yy, ln) when ln >= 4000 && ln <= 4999 && yy >= 00 && yy <= 36 -> Some 2000
-                | (yy, ln) when ln >= 4000 && ln <= 4999 && yy >= 37 && yy <= 99 -> Some 1900
-                | (yy, ln) when ln >= 5000 && ln <= 5999 && yy >= 00 && yy <= 57 -> Some 2000
-                | (yy, ln) when ln >= 5000 && ln <= 5999 && yy >= 58 && yy <= 99 -> Some 1800
-                | (yy, ln) when ln >= 6000 && ln <= 6999 && yy >= 00 && yy <= 57 -> Some 2000
-                | (yy, ln) when ln >= 6000 && ln <= 6999 && yy >= 58 && yy <= 99 -> Some 1800
-                | (yy, ln) when ln >= 7000 && ln <= 7999 && yy >= 00 && yy <= 57 -> Some 2000
-                | (yy, ln) when ln >= 7000 && ln <= 7999 && yy >= 58 && yy <= 99 -> Some 1800
-                | (yy, ln) when ln >= 8000 && ln <= 8999 && yy >= 00 && yy <= 57 -> Some 2000
-                | (yy, ln) when ln >= 8000 && ln <= 8999 && yy >= 58 && yy <= 99 -> Some 1800
-                | (yy, ln) when ln >= 9000 && ln <= 9999 && yy >= 00 && yy <= 36 -> Some 2000
-                | (yy, ln) when ln >= 9000 && ln <= 9999 && yy >= 37 && yy <= 99 -> Some 1900
-                | _ -> None
-        yearOffset
-        |> Option.map (fun x -> DateTime(x + (int) cpr.Fødselsår, (int) cpr.Fødselsmåned, (int) cpr.Fødselsdag))
+        try 
+            Some (DateTime(birthyearForFødselsårLøbenummer cpr.Fødselsår cpr.Løbenummer, (int) cpr.Fødselsmåned, (int) cpr.Fødselsdag))
+        with
+            | :? System.ArgumentOutOfRangeException as ex -> None
 
 
     /// <summary>

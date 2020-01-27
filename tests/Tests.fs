@@ -52,6 +52,18 @@ module Parsing =
         Assert.True(Option.isNone actual)
 
 module Validation =
+    type ``isValidFødselsårValue`` () =
+        [<Fact>]
+        member _.``all two-digit values are valid`` () = 
+            [0uy .. 99uy]
+            |> Seq.where (CprNummer.isValidFødselsårValue >> not)
+            |> Assert.Empty
+
+        member _.``values with more than two digits are invalid`` () = 
+            [100uy .. Byte.MaxValue]
+            |> Seq.filter CprNummer.isValidFødselsårValue
+            |> Assert.Empty
+
 
     type ``isSyntacticallyValid`` () =
 
@@ -119,18 +131,61 @@ module Decoding =
         [<Theory>]
         [<InlineData("010200-0001", 01,02,1900)>]
         [<InlineData("010299-0001", 01,02,1999)>]
-        [<InlineData("010200-0999", 01,02,1900)>]
-        [<InlineData("010299-0999", 01,02,1999)>]
+        [<InlineData("010200-1001", 01,02,1900)>]
+        [<InlineData("010299-2001", 01,02,1999)>]
+        [<InlineData("010299-3001", 01,02,1999)>]
 
         [<InlineData("010200-4000", 01,02,2000)>]
         [<InlineData("010200-4999", 01,02,2000)>]
         [<InlineData("010236-4000", 01,02,2036)>]
         [<InlineData("010236-4999", 01,02,2036)>]
+        [<InlineData("010237-4000", 01,02,1937)>]
+        [<InlineData("010299-4999", 01,02,1999)>]
 
+        [<InlineData("010200-5000", 01,02,2000)>]
+        [<InlineData("010200-5999", 01,02,2000)>]
+        [<InlineData("010257-5000", 01,02,2057)>]
+        [<InlineData("010257-5999", 01,02,2057)>]
         [<InlineData("010258-5000", 01,02,1858)>]
         [<InlineData("010258-5999", 01,02,1858)>]
         [<InlineData("010299-5000", 01,02,1899)>]
         [<InlineData("010299-5999", 01,02,1899)>]
+
+        [<InlineData("010200-6000", 01,02,2000)>]
+        [<InlineData("010200-6999", 01,02,2000)>]
+        [<InlineData("010257-6000", 01,02,2057)>]
+        [<InlineData("010257-6999", 01,02,2057)>]
+        [<InlineData("010258-6000", 01,02,1858)>]
+        [<InlineData("010258-6999", 01,02,1858)>]
+        [<InlineData("010299-6000", 01,02,1899)>]
+        [<InlineData("010299-6999", 01,02,1899)>]
+
+        [<InlineData("010200-7000", 01,02,2000)>]
+        [<InlineData("010200-7999", 01,02,2000)>]
+        [<InlineData("010257-7000", 01,02,2057)>]
+        [<InlineData("010257-7999", 01,02,2057)>]
+        [<InlineData("010258-7000", 01,02,1858)>]
+        [<InlineData("010258-7999", 01,02,1858)>]
+        [<InlineData("010299-7000", 01,02,1899)>]
+        [<InlineData("010299-7999", 01,02,1899)>]
+
+        [<InlineData("010200-8000", 01,02,2000)>]
+        [<InlineData("010200-8999", 01,02,2000)>]
+        [<InlineData("010257-8000", 01,02,2057)>]
+        [<InlineData("010257-8999", 01,02,2057)>]
+        [<InlineData("010258-8000", 01,02,1858)>]
+        [<InlineData("010258-8999", 01,02,1858)>]
+        [<InlineData("010299-8000", 01,02,1899)>]
+        [<InlineData("010299-8999", 01,02,1899)>]
+
+        [<InlineData("010200-9000", 01,02,2000)>]
+        [<InlineData("010200-9999", 01,02,2000)>]
+        [<InlineData("010236-9000", 01,02,2036)>]
+        [<InlineData("010236-9999", 01,02,2036)>]
+        [<InlineData("010237-9000", 01,02,1937)>]
+        [<InlineData("010237-9999", 01,02,1937)>]
+        [<InlineData("010299-9000", 01,02,1999)>]
+        [<InlineData("010299-9999", 01,02,1999)>]
 
         let ``birthday examples``  (str, day, month, year) = 
             let cpr = CprNummer.tryParseCprNummer(str) |> Option.get
