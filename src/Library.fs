@@ -3,6 +3,14 @@
 open System
 open System.Text.RegularExpressions
 
+/// Fødselsdag (Danish for day of birth) is digits 1-2 of the CPR-nummer.
+type Fødselsdag = uint8
+/// Fødselsmåned (Danish for month of birth) is digits 3-4 of the CPR-nummer.
+type Fødselsmåned = uint8
+/// Fødselsår (Danish for year of birth) is digits 5-6 of the CPR-nummer.
+type Fødselsår = uint8
+/// Løbenummer (Danish for serial number) is digits 7-10 of the CPR-nummer.
+type Løbenummer = uint16
 
 /// <Summary>
 /// A CPR-nummer is a Danish goverment-issued person ID number.
@@ -15,16 +23,17 @@ type CprNummer =
     // if we stored an array of digits we would get reference equality on the arrays
     {
       /// Digits 1-2
-      Fødselsdag: uint8
+      Fødselsdag: Fødselsdag
       /// Digits 3-4
-      Fødselsmåned: uint8
+      Fødselsmåned: Fødselsmåned
       /// Digits 5-6<
-      Fødselsår: uint8
+      Fødselsår: Fødselsår
       /// Digits 7-10
-      Løbenummer: uint16 }
+      Løbenummer: Løbenummer }
     // Don't let the CPR-nummer leak into logs etc. through ToString
     override x.ToString() = "CPR-nummer xxxxxx-xxxx"
 
+/// The gender of the person associated with the CPR-nummer.
 type Gender = | Male | Female
 
 
@@ -54,10 +63,10 @@ module CprNummer =
             None
 
     /// Check that a value is a valid Fødselsår (digits 5-6 of the CPR-nummer) 
-    let isValidFødselsårValue (fødselsår:uint8) = 0uy <= fødselsår && fødselsår <= 99uy
+    let isValidFødselsårValue (fødselsår:Fødselsår) = 0uy <= fødselsår && fødselsår <= 99uy
 
     /// Check that a value is a valid Løbenummer (digits 7-10 of the CPR-nummer) 
-    let isValidLøbenummerValue (løbenummer:uint16) = 0us <= løbenummer && løbenummer <= 9999us
+    let isValidLøbenummerValue (løbenummer:Løbenummer) = 0us <= løbenummer && løbenummer <= 9999us
 
     /// <summary>
     /// Predicate to check if the CprNummer instance is syntactically valid.
