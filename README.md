@@ -4,7 +4,7 @@ A _CPR-nummer_ (plural: _CPR-numre_) is a Danish government citizen ID number as
 
 The _CPR-nummer_ is used for a number of purposes such as _e.g._ tax reporting, identifying people in legal documents and in
 _[NemID](https://www.nemid.nu/)_, the government-provided Danish two-factor authentication system.
-It is also used for _[NemKonto](https://www.nemkonto.dk)_ where you can transfor money to an account by the owners' _CPR-nummer_ without knowing the account details.
+It is also used for _[NemKonto](https://www.nemkonto.dk)_ where you can transfer money to an account by the owners' _CPR-nummer_ without knowing the account details.
 
 This library makes using it simple and supports the often-missed edge cases such as modulus checksums and valid variants such as _erstatningspersonnumer_ ("substitute _CPR-nummer_").
 
