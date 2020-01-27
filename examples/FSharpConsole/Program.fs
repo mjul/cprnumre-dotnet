@@ -12,7 +12,7 @@ let main argv =
         printfn "Birthday is: %s" (match (CprNummer.birthday cpr) with 
                                   | Some bd -> bd.ToString("dd-MM-yyyy") 
                                   | None-> "Not a valid date")
-        printfn "Gender is: %A" (CprNummer.gender cpr) 
+        printfn "Gender is: %A" cpr.Gender 
         printfn "Modulus 11 checksum correct: %b" (CprNummer.isChecksumValid cpr)
         Console.WriteLine("ToString does not leak private information: {0}", cpr) 
     | None ->

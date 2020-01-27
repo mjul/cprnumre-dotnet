@@ -198,14 +198,14 @@ module Decoding =
         [<InlineData("010200-0001")>]
         let ``gender examples for men`` str =
             let cpr = CprNummer.tryParseCprNummer(str) |> Option.get
-            let actual = CprNummer.gender cpr
+            let actual = cpr.Gender
             Assert.Equal(Male, actual)
 
         [<Theory>]
         [<InlineData("010200-0002")>]
         let ``gender examples for women`` str =
             let cpr = CprNummer.tryParseCprNummer(str) |> Option.get
-            let actual = CprNummer.gender cpr
+            let actual = cpr.Gender
             Assert.Equal(Female, actual)
 
 module Privacy = 

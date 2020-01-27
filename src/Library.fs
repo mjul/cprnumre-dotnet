@@ -12,6 +12,9 @@ type Fødselsår = uint8
 /// Løbenummer (Danish for serial number) is digits 7-10 of the CPR-nummer.
 type Løbenummer = uint16
 
+/// The gender of the person associated with the CPR-nummer.
+type Gender = | Male | Female
+
 /// <Summary>
 /// A CPR-nummer is a Danish goverment-issued person ID number.
 /// This type has value semantics.
@@ -33,8 +36,13 @@ type CprNummer =
     // Don't let the CPR-nummer leak into logs etc. through ToString
     override x.ToString() = "CPR-nummer xxxxxx-xxxx"
 
-/// The gender of the person associated with the CPR-nummer.
-type Gender = | Male | Female
+    /// <summary>
+    /// Get the Gender from the CPR-nummer.
+    /// </summary>
+    member x.Gender with get() = 
+        match (x.Løbenummer % 2us) with
+        | 0us -> Female
+        | _ -> Male
 
 
 /// <Summary>
@@ -134,12 +142,3 @@ module CprNummer =
             Some (DateTime(birthyearForFødselsårLøbenummer cpr.Fødselsår cpr.Løbenummer, (int) cpr.Fødselsmåned, (int) cpr.Fødselsdag))
         with
             | :? System.ArgumentOutOfRangeException as ex -> None
-
-
-    /// <summary>
-    /// Get the Gender from the CPR-nummer.
-    /// </summary>
-    let gender (cprNummer: CprNummer) = 
-        match ((int cprNummer.Løbenummer) % 2) with
-        | 0 -> Female
-        | _ -> Male
