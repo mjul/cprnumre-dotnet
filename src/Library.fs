@@ -113,8 +113,9 @@ module CprNummer =
         // (the thousands of the Løbenummer), so we can simplify a bit
         let thousandsOfLøbenummer = (løbenummer / 1000us) % 10us
         let splitRange minOfHighRange offsetBelow offsetAbove yy = if yy < minOfHighRange then offsetBelow else offsetAbove
-        let yearOffset = match (int fødselsår, int thousandsOfLøbenummer) with
-            | (_, 0) | (_,1) | (_,2) | (_,3) -> 1900
+        let yearOffset = 
+            match (int fødselsår, int thousandsOfLøbenummer) with
+            | (_, 0) | (_, 1) | (_, 2) | (_, 3) -> 1900
             | (yy, 4) -> if yy >= 00 && yy <= 36 then 2000 else 1900
             | (yy, 5) -> if yy >= 00 && yy <= 57 then 2000 else 1800
             | (yy, 6) -> if yy >= 00 && yy <= 57 then 2000 else 1800
