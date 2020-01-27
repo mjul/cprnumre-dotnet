@@ -56,12 +56,12 @@ module Validation =
         [<Fact>]
         member _.``all two-digit values are valid`` () = 
             [0uy .. 99uy]
-            |> Seq.where (CprNummer.isValidFødselsårValue >> not)
+            |> Seq.where (Internals.isValidFødselsårValue >> not)
             |> Assert.Empty
 
         member _.``values with more than two digits are invalid`` () = 
             [100uy .. Byte.MaxValue]
-            |> Seq.filter CprNummer.isValidFødselsårValue
+            |> Seq.filter Internals.isValidFødselsårValue
             |> Assert.Empty
 
 
@@ -70,7 +70,7 @@ module Validation =
         static member AllDatesInLeapYearData
             with get() =
                 [for dayOffset in 0..365 do
-                    let date : obj[] =  [| (System.DateTime(2020,1,1).AddDays((float)dayOffset)) |]
+                    let date : obj[] =  [| (DateTime(2020,1,1).AddDays((float)dayOffset)) |]
                     yield date]
 
         [<Theory>]
@@ -189,9 +189,10 @@ module Decoding =
 
         let ``birthday examples``  (str, day, month, year) = 
             let cpr = CprNummer.tryParseCprNummer(str) |> Option.get
-            let expected = Some (DateTime.SpecifyKind(DateTime(year, month, day), DateTimeKind.Unspecified))
-            let actual = CprNummer.birthday cpr
-            Assert.Equal(expected, actual)
+            let expectedValue = DateTime.SpecifyKind(DateTime(year, month, day), DateTimeKind.Unspecified)
+            let actual = cpr.Birthday
+            Assert.True(actual.HasValue)
+            Assert.Equal(expectedValue, actual.Value)
 
     type ``Gender decoding`` () = 
         [<Theory>]

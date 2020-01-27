@@ -9,8 +9,8 @@ let main argv =
     let result = CprNummer.tryParseCprNummer txt
     match result with 
     | Some cpr -> 
-        printfn "Birthday is: %s" (match (CprNummer.birthday cpr) with 
-                                  | Some bd -> bd.ToString("dd-MM-yyyy") 
+        printfn "Birthday is: %s" (match cpr.Birthday |> Option.ofNullable with 
+                                  | Some bd -> bd.ToString("dd-MM-yyyy")
                                   | None-> "Not a valid date")
         printfn "Gender is: %A" cpr.Gender 
         printfn "Modulus 11 checksum correct: %b" (CprNummer.isChecksumValid cpr)
