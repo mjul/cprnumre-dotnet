@@ -82,13 +82,13 @@ type CprNummer =
       /// Digits 7-10
       Løbenummer: Løbenummer }
     // Don't let the CPR-nummer leak into logs etc. through ToString
-    override x.ToString() = "CPR-nummer xxxxxx-xxxx"
+    override __.ToString() = "CPR-nummer xxxxxx-xxxx"
 
     /// <summary>
     /// Get the Gender from the CPR-nummer.
     /// </summary>
-    member x.Gender with get() = 
-        match (x.Løbenummer % 2us) with
+    member this.Gender with get() = 
+        match (this.Løbenummer % 2us) with
         | 0us -> Female
         | _ -> Male
 
